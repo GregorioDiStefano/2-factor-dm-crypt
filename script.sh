@@ -23,6 +23,7 @@ boot_2_usb()
 
     cat $tmpfile > /etc/fstab
     echo $boot_line >> /etc/fstab
+    grub-install /dev/sdb
 }
 
 
@@ -128,8 +129,6 @@ fi
 
 check_dependacies
 check_device /dev/sda
-
-
 
 echo -n "Enter usb block device (ex: sdb): "
 read usb_device
