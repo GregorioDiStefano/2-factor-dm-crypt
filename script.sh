@@ -3,9 +3,10 @@ keyfile="/tmp/key"
 
 boot_2_usb()
 {
-    number=1
-    device_partition=$usb_device$number
-    tmpfile=$(mktemp)
+    local number=1
+    local device_partition=$usb_device$number
+    local tmpfile=$(mktemp)
+    
     for n in /dev/$usb_device* ; do umount $n; done
     dd if=/dev/zero of=/dev/$usb_device count=1000 bs=1024 2>/dev/null
 
