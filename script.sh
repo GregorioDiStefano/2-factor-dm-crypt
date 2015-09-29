@@ -16,14 +16,14 @@ boot_2_usb()
     mount /dev/$device_partition /tmp/new_boot
     cd /boot && cp -ax . /tmp/new_boot
 
-    local uuid=$(blkid -oexport /dev/sdb1 | sed -n 's/^UUID=//p')
+    local uuid=$(blkid -oexport /dev/$device_partition | sed -n 's/^UUID=//p')
     local boot_line=$(printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults")
 
     sed '/\/boot/d' /etc/fstab > $tmpfile
 
     cat $tmpfile > /etc/fstab
     echo $boot_line >> /etc/fstab
-    grub-install /dev/sdb
+    grub-install /dev/$device_partition
 }
 
 
