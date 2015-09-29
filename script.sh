@@ -1,9 +1,6 @@
 gpg_url="https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-1.4.19.tar.bz2"
 keyfile="/tmp/key"
 
-RED='\033[0;31m'
-NC='\033[0m'
-
 boot_2_usb()
 {
     number=1
@@ -38,7 +35,7 @@ create_key_file()
 check_device_usb()
 {
     removable=$(cat /sys/block/$1/removable)
-    if [[ removable -eq 0 ]]; then
+    if [[ $removable -eq 0 ]]; then
         echo "Specfied USB device is probably not a USB device.."
         return -1
     fi
