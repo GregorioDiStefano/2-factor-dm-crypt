@@ -16,8 +16,8 @@ boot_2_usb()
     mount /dev/$device_partition /tmp/new_boot
     cd /boot && cp -ax . /tmp/new_boot
 
-    uuid=$(blkid -oexport /dev/sdb1 | sed -n 's/^UUID=//p')
-    boot_line=$(printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults")
+    local uuid=$(blkid -oexport /dev/sdb1 | sed -n 's/^UUID=//p')
+    local boot_line=$(printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults")
 
     sed '/\/boot/d' /etc/fstab > $tmpfile
 
@@ -35,7 +35,7 @@ create_key_file()
 
 check_device_usb()
 {
-    removable=$(cat /sys/block/$1/removable)
+    local removable=$(cat /sys/block/$1/removable)
     if [[ $removable -eq 0 ]]; then
         echo "Specfied USB device is probably not a USB device.."
         return -1
@@ -83,7 +83,7 @@ get_password()
 
 check_dependacies()
 {
-    required="cryptsetup gcc curl update-initramfs"
+    local required="cryptsetup gcc curl update-initramfs"
     for r in $required; do
         if ! type "$r" > /dev/null; then
             exit -1
