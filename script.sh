@@ -1,5 +1,7 @@
 gpg_url="https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-1.4.19.tar.bz2"
 keyfile="/tmp/key"
+gpg_hook="IyEvYmluL3NoIC1lCiMgaW5pdHJhbWZzIGhvb2sgZm9yIHdhdGVyc2hlZAoKUFJFUkVRPSIiCgojIE91dHB1dCBwcmUtcmVxdWlzaXRlcwpwcmVyZXFzKCkKewoJZWNobyAiJFBSRVJFUSIKfQoKY2FzZSAiJDEiIGluCiAgICBwcmVyZXFzKQoJcHJlcmVxcwoJZXhpdCAwCgk7Owplc2FjCgoKLiAvdXNyL3NoYXJlL2luaXRyYW1mcy10b29scy9ob29rLWZ1bmN0aW9ucwoKCgpjb3B5X2V4ZWMgL3RtcC9ncGcgL3NiaW4vIAo="
+
 
 boot_2_usb()
 {
@@ -25,6 +27,13 @@ boot_2_usb()
     grub-install /dev/$device_partition
 }
 
+modifiy_initramfs()
+{
+   echo $gpg_hook | base64 -d > /usr/share/initramfs-tools/hooks/gpg
+   chmod +x /tmp/gpg
+   chmod +x /usr/share/initramfs-tools/hooks/gpg
+   update-initramfs -k all -c
+}
 
 create_key_file()
 {
@@ -38,7 +47,7 @@ check_device_usb()
     local removable=$(cat /sys/block/$1/removable)
     if [[ $removable -eq 0 ]]; then
         echo "Specfied USB device is probably not a USB device.."
-        return -1
+        exit 1
     fi
 }
 
@@ -129,16 +138,22 @@ if [ $(id -u) -ne 0 ]; then
     echo "You must be root to run this script" && exit -1
 fi
 
+
+
 check_dependacies
 check_device /dev/sda
 
 echo -n "Enter usb block device (ex: sdb): "
 read usb_device
 
-check_device_usb $usb_device
-get_password
-passphrase=$keyfile_passphrase_2
-create_key_file $passphrase
+#check_device_usb $usb_device
+boot_2_usb
+fix_gpg
+modifiy_initramfs
+
+#get_password
+#passphrase=$keyfile_passphrase_2
+#create_key_file $passphrase
 #fix_gpg
 
 
