@@ -16,13 +16,12 @@ boot_2_usb()
     mount /dev/$device_partition /tmp/new_boot
     cd /boot && cp -ax . /tmp/new_boot
 
-    local uuid=$(blkid -oexport /dev/$device_partition | sed -n 's/^UUID=//p')
-    local boot_line=$(printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults")
-
     sed '/\/boot/d' /etc/fstab > $tmpfile
-
     cat $tmpfile > /etc/fstab
-    echo $boot_line >> /etc/fstab
+    
+    local uuid=$(blkid -oexport /dev/$device_partition | sed -n 's/^UUID=//p')
+    printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults" >> /etc/fstab
+    
     grub-install /dev/$device_partition
 }
 
@@ -59,10 +58,8 @@ fix_gpg()
         return -1
     fi
 
-    tar -xf gnupgp.tar.bz2
-    cd gnupg-1.4.19 && ./configure CFLAGS="-static"
-    make
-    cp g10/gpg /tmp
+    tar -xf gnupgp.tar.bz2 && cd gnupg-1.4.19 && ./configure CFLAGS="-static"
+    make -j2 && cp g10/gpg /tmp && chmod +x /tmp/gpg 
 }
 
 
