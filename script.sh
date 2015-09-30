@@ -114,10 +114,15 @@ cat  << EOF
     cryptsetup on boot.
 
     This script will make the following changes to your system:
-        -
-        -
-        -
-        -
+        - Reformat and install grub2 on an inserted USB key
+        - Move the /boot mount point to the USB key
+        - Modify the initramfs image to include gpg
+        - Generate and store a keyfile on the USB key
+        - Modify the initramfs cryptroot script to:
+            1) ask for a passphrase to decrypt the keyfile with gpg
+            2) pass the unecrypted keyfile to crpytsetup
+        - Remove the passphrase via LUKS, leaving only the keyfile
+        
 EOF
 
 if [ $(id -u) -ne 0 ]; then
