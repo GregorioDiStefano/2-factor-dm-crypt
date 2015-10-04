@@ -8,7 +8,7 @@ boot_2_usb()
     local number=1
     local device_partition=$usb_device$number
     local tmpfile=$(mktemp)
-    
+
     for n in /dev/$usb_device* ; do umount $n; done
     dd if=/dev/zero of=/dev/$usb_device count=1000 bs=1024 2>/dev/null
 
@@ -20,11 +20,11 @@ boot_2_usb()
 
     sed '/\/boot/d' /etc/fstab > $tmpfile
     cat $tmpfile > /etc/fstab
-    
+
     local uuid=$(blkid -oexport /dev/$device_partition | sed -n 's/^UUID=//p')
     printf "%s\t%s\t%s\t%s" "UUID=$uuid" "/boot" "ext4" "defaults" >> /etc/fstab
-    
-    grub-install /dev/$device_partition
+
+    grub-install /dev/$usb_device
 }
 
 modifiy_initramfs()
@@ -54,6 +54,7 @@ check_device_usb()
 
 fix_gpg()
 {
+    cd /boot/
     if hash curl 2>/dev/null; then
         curl $gpg_url -o gnupgp.tar.bz2 2>/dev/null
     elif hash wget 2>/dev/null; then
@@ -131,7 +132,6 @@ cat  << EOF
             1) ask for a passphrase to decrypt the keyfile with gpg
             2) pass the unecrypted keyfile to crpytsetup
         - Remove the passphrase via LUKS, leaving only the keyfile
-        
 EOF
 
 if [ $(id -u) -ne 0 ]; then
